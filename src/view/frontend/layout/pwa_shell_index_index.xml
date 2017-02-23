@@ -2,13 +2,16 @@
 <page layout="shell" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <referenceContainer name="columns">
+        <referenceContainer name="columns" htmlId="shell-target">
             <!-- Add a placeholder block to force the container to print its <div> wrapper -->
             <block name="pwa.placeholder" class="Magento\Framework\View\Element\Text">
                 <arguments>
                     <argument name="text" xsi:type="string"><![CDATA[<!-- Main content -->]]></argument>
                 </arguments>
             </block>
+        </referenceContainer>
+        <referenceContainer name="before.body.end">
+            <block class="Magento\Framework\View\Element\Template" name="shell.init" after="-" template="Meanbee_PWA::shell-init.phtml" />
         </referenceContainer>
     </body>
 </page>
