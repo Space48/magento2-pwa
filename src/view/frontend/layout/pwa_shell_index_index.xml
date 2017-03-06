@@ -2,6 +2,10 @@
 <page layout="shell" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
+        <!-- Ensure minicart has its dependencies config available -->
+        <move element="customer.section.config" destination="header.container" />
+        <move element="customer.customer.data" destination="header.container" />
+
         <referenceContainer name="columns" htmlId="shell-target" htmlClass="shell-target">
             <block name="pwa.placeholder" class="Magento\Framework\View\Element\Template" template="Meanbee_PWA::shell-init.phtml"/>
         </referenceContainer>
