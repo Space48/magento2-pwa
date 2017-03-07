@@ -20,7 +20,7 @@ define([
         .done(function( data ) {
             target.html(data.content);
             target.removeClass('is-fetching');
-            mage.apply();
+            $('body').trigger('contentUpdated');
         })
         .fail(function( error ) {
             console.log('There has been a problem with your ajax operation: ' + error.message);
