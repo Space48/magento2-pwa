@@ -18,5 +18,6 @@ ln -s /src $MAGENTO_ROOT/src
 # Enable the extension and run migrations
 magento-command module:enable Meanbee_PWA
 magento-command setup:upgrade
+magento-command setup:di:compile
 magento-command setup:static-content:deploy
 magento-command cache:flush
