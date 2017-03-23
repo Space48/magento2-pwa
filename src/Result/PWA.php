@@ -7,6 +7,9 @@ use Magento\Framework\App\ResponseInterface;
 
 class PWA extends View\Result\Page
 {
+    /** @var \Meanbee\PWA\Helper\Config $configHelper */
+    protected $configHelper;
+
     /** @var \Magento\Framework\Json\EncoderInterface $jsonEncoder */
     protected $jsonEncoder;
 
@@ -20,6 +23,7 @@ class PWA extends View\Result\Page
         View\Page\Config\RendererFactory $pageConfigRendererFactory,
         View\Page\Layout\Reader $pageLayoutReader,
         \Magento\Framework\Json\EncoderInterface $jsonEncoder,
+        \Meanbee\PWA\Helper\Config $configHelper,
         $template,
         $isIsolated
     ) {
@@ -36,6 +40,7 @@ class PWA extends View\Result\Page
             $isIsolated
         );
 
+        $this->configHelper = $configHelper;
         $this->jsonEncoder = $jsonEncoder;
     }
 
@@ -45,7 +50,7 @@ class PWA extends View\Result\Page
      */
     protected function render(ResponseInterface $response)
     {
-        if ($this->request->getParam("service_worker", false)) {
+        if ($this->request->getParam($this->configHelper->getServiceWorkerUrlParamName(), false)) {
             $this->pageConfig->publicBuild();
             $this->getLayout()
                 ->removeOutputElement("root")
