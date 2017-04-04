@@ -13,8 +13,8 @@ class PWA extends View\Result\Page
     /** @var \Magento\Framework\Json\EncoderInterface $jsonEncoder */
     protected $jsonEncoder;
 
-    /** @var  View\Asset\GroupedCollection $groupedCollection */
-    protected $groupedCollection;
+    /** @var  View\Asset\GroupedCollectionFactory $groupedCollectionFactory */
+    protected $groupedCollectionFactory;
 
     public function __construct(
         View\Element\Template\Context $context,
@@ -27,7 +27,7 @@ class PWA extends View\Result\Page
         View\Page\Layout\Reader $pageLayoutReader,
         \Magento\Framework\Json\EncoderInterface $jsonEncoder,
         \Meanbee\PWA\Helper\Config $configHelper,
-        View\Asset\GroupedCollection $groupedCollection,
+        View\Asset\GroupedCollectionFactory $groupedCollectionFactory,
         $template,
         $isIsolated
     ) {
@@ -46,7 +46,7 @@ class PWA extends View\Result\Page
 
         $this->configHelper = $configHelper;
         $this->jsonEncoder = $jsonEncoder;
-        $this->groupedCollection = $groupedCollection;
+        $this->groupedCollectionFactory = $groupedCollectionFactory;
     }
 
 
@@ -81,6 +81,7 @@ class PWA extends View\Result\Page
     protected function renderPageSpecificCss()
     {
         $defaultAssetIds = $this->getDefaultHandleAssetIds();
+        $collection = $this->groupedCollectionFactory->create();
 
         // Loop over each asset group on the page
         foreach ($this->getConfig()->getAssetCollection()->getGroups() as $group) {
@@ -96,12 +97,12 @@ class PWA extends View\Result\Page
 
             // Add the remaining assets to an identical group in a separate grouped collection
             foreach ($assets as $identifier => $asset) {
-                $this->groupedCollection->add($identifier, $asset, $group->getProperties());
+                $collection->add($identifier, $asset, $group->getProperties());
             }
         }
 
-        if (count($this->groupedCollection->getAll()) > 0) {
-            return $this->pageConfigRenderer->renderAssetCollection($this->groupedCollection);
+        if (count($collection->getAll()) > 0) {
+            return $this->pageConfigRenderer->renderAssetCollection($collection);
         }
 
         return "";
