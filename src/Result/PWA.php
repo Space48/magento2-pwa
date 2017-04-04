@@ -13,6 +13,9 @@ class PWA extends View\Result\Page
     /** @var \Magento\Framework\Json\EncoderInterface $jsonEncoder */
     protected $jsonEncoder;
 
+    /** @var  View\Asset\GroupedCollection $groupedCollection */
+    protected $groupedCollection;
+
     public function __construct(
         View\Element\Template\Context $context,
         View\LayoutFactory $layoutFactory,
@@ -24,6 +27,7 @@ class PWA extends View\Result\Page
         View\Page\Layout\Reader $pageLayoutReader,
         \Magento\Framework\Json\EncoderInterface $jsonEncoder,
         \Meanbee\PWA\Helper\Config $configHelper,
+        View\Asset\GroupedCollection $groupedCollection,
         $template,
         $isIsolated
     ) {
@@ -42,6 +46,7 @@ class PWA extends View\Result\Page
 
         $this->configHelper = $configHelper;
         $this->jsonEncoder = $jsonEncoder;
+        $this->groupedCollection = $groupedCollection;
     }
 
 
@@ -57,7 +62,7 @@ class PWA extends View\Result\Page
                 ->addOutputElement("columns");
 
             $data = [
-                "content" => $this->getLayout()->getOutput(),
+                "content" => $this->getLayout()->getOutput() . $this->renderPageSpecificCss(),
             ];
 
             $response->representJson($this->jsonEncoder->encode($data));
@@ -66,5 +71,62 @@ class PWA extends View\Result\Page
         } else {
             return parent::render($response);
         }
+    }
+
+    /**
+     * Render CSS assets specific to the handles on this page (excluding the default handle).
+     *
+     * @return string
+     */
+    protected function renderPageSpecificCss()
+    {
+        $defaultAssetIds = $this->getDefaultHandleAssetIds();
+
+        // Loop over each asset group on the page
+        foreach ($this->getConfig()->getAssetCollection()->getGroups() as $group) {
+            // Skip groups that contain non-css assets
+            if ($group->getProperty(View\Asset\GroupedCollection::PROPERTY_CONTENT_TYPE) !== "css") {
+                continue;
+            }
+
+            // Filter out the assets in the group that appear on the default handle
+            $assets = array_filter($group->getAll(), function ($key) use ($defaultAssetIds) {
+                return !in_array($key, $defaultAssetIds);
+            }, ARRAY_FILTER_USE_KEY);
+
+            // Add the remaining assets to an identical group in a separate grouped collection
+            foreach ($assets as $identifier => $asset) {
+                $this->groupedCollection->add($identifier, $asset, $group->getProperties());
+            }
+        }
+
+        if (count($this->groupedCollection->getAll()) > 0) {
+            return $this->pageConfigRenderer->renderAssetCollection($this->groupedCollection);
+        }
+
+        return "";
+    }
+
+    /**
+     * Get the list of asset identifiers assigned to the "default" layout handle.
+     * @return array
+     */
+    protected function getDefaultHandleAssetIds()
+    {
+        /** @var \Magento\Framework\View\Layout $defaultLayout */
+        $defaultLayout = $this->layoutFactory->create();
+        $defaultLayout->getUpdate()->addHandle("default");
+
+        $defaultLayoutBuilder = $this->layoutBuilderFactory->create(View\Layout\BuilderFactory::TYPE_LAYOUT, [
+            "layout" => $defaultLayout,
+        ]);
+
+        $defaultLayoutBuilder->build();
+
+        return array_keys(
+            $defaultLayout->getReaderContext()
+                ->getPageConfigStructure()
+                ->getAssets()
+        );
     }
 }
