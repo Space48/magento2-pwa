@@ -7,6 +7,8 @@ use Magento\Framework\App\ResponseInterface;
 
 class PWA extends View\Result\Page
 {
+    const OUTPUT_CONTAINER_NAME = "columns";
+
     /** @var \Meanbee\PWA\Helper\Config $configHelper */
     protected $configHelper;
 
@@ -56,10 +58,20 @@ class PWA extends View\Result\Page
     protected function render(ResponseInterface $response)
     {
         if ($this->request->getParam($this->configHelper->getServiceWorkerUrlParamName(), false)) {
-            $this->pageConfig->publicBuild();
-            $this->getLayout()
+            /** @var \Meanbee\PWA\Model\View\Layout $layout */
+            $layout = $this->getLayout();
+
+            // Render the output container instead of the entire page
+            $layout
                 ->removeOutputElement("root")
-                ->addOutputElement("columns");
+                ->addOutputElement(static::OUTPUT_CONTAINER_NAME);
+
+            // Migrate the body classes to the output container
+            $containerClass = implode(" ", array_filter([
+                $layout->getElementProperty(static::OUTPUT_CONTAINER_NAME, "htmlClass"),
+                $this->getBodyClassString(),
+            ]));
+            $layout->setElementProperty(static::OUTPUT_CONTAINER_NAME, "htmlClass", $containerClass);
 
             $data = [
                 "content" => $this->getLayout()->getOutput() . $this->renderPageSpecificCss(),
@@ -71,6 +83,18 @@ class PWA extends View\Result\Page
         } else {
             return parent::render($response);
         }
+    }
+
+    /**
+     * Get the string of HTML classes assigned to the <body> element.
+     *
+     * @return string
+     */
+    protected function getBodyClassString()
+    {
+        $this->addDefaultBodyClasses();
+
+        return $this->getConfig()->getElementAttribute(View\Page\Config::ELEMENT_TYPE_BODY, "class") ?: "";
     }
 
     /**
