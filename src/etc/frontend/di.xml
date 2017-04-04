@@ -2,7 +2,6 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Magento\Framework\View\Result\Page" type="Meanbee\PWA\Result\PWA"/>
-    <preference for="Magento\Framework\View\Page\Config\Renderer" type="Meanbee\PWA\Model\View\Page\Config\Renderer"/>
     <type name="Magento\Framework\Url\QueryParamsResolver">
         <plugin name="Meanbee_PWA" type="Meanbee\PWA\Plugin\QueryParamsResolverPlugin" sortOrder="1" disabled="false"/>
     </type>
@@ -16,10 +15,16 @@
             <argument name="instanceName" xsi:type="string">Meanbee\PWA\Model\View\Layout</argument>
         </arguments>
     </virtualType>
+    <virtualType name="Meanbee\PWA\Model\View\Page\Config\RendererFactory" type="Magento\Framework\View\Page\Config\RendererFactory">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">Meanbee\PWA\Model\View\Page\Config\Renderer</argument>
+        </arguments>
+    </virtualType>
     <type name="Meanbee\PWA\Result\PWA">
         <arguments>
             <argument name="context" xsi:type="object">pwa_result_context</argument>
             <argument name="layoutFactory" xsi:type="object">Meanbee\PWA\Model\View\LayoutFactory</argument>
+            <argument name="pageConfigRendererFactory" xsi:type="object">Meanbee\PWA\Model\View\Page\Config\RendererFactory</argument>
         </arguments>
     </type>
 </config>
