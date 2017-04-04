@@ -20,7 +20,6 @@
         <arguments>
             <argument name="context" xsi:type="object">pwa_result_context</argument>
             <argument name="layoutFactory" xsi:type="object">Meanbee\PWA\Model\View\LayoutFactory</argument>
-            <argument name="groupedCollection" xsi:type="object" shared="false">Magento\Framework\View\Asset\GroupedCollection</argument>
         </arguments>
     </type>
 </config>
