@@ -15,6 +15,9 @@ class PWA extends View\Result\Page
     /** @var \Magento\Framework\Json\EncoderInterface $jsonEncoder */
     protected $jsonEncoder;
 
+    /** @var \Magento\Framework\Escaper $escaper */
+    protected $escaper;
+
     /** @var  View\Asset\GroupedCollectionFactory $groupedCollectionFactory */
     protected $groupedCollectionFactory;
 
@@ -48,6 +51,7 @@ class PWA extends View\Result\Page
 
         $this->configHelper = $configHelper;
         $this->jsonEncoder = $jsonEncoder;
+        $this->escaper = $context->getEscaper();
         $this->groupedCollectionFactory = $groupedCollectionFactory;
     }
 
@@ -78,6 +82,7 @@ class PWA extends View\Result\Page
             $layout->setElementProperty(static::OUTPUT_CONTAINER_NAME, "htmlClass", $containerClass);
 
             $data = [
+                "title"   => $this->getPageTitle(),
                 "content" => $layout->getOutput() . $this->renderPageSpecificCss(),
             ];
 
@@ -87,6 +92,16 @@ class PWA extends View\Result\Page
         } else {
             return parent::render($response);
         }
+    }
+
+    /**
+     * Get the page title.
+     *
+     * @return string
+     */
+    protected function getPageTitle()
+    {
+        return $this->escaper->escapeHtml($this->pageConfig->getTitle()->get());
     }
 
     /**
