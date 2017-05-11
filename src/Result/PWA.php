@@ -65,6 +65,10 @@ class PWA extends View\Result\Page
             /** @var \Meanbee\PWA\Model\View\Layout $layout */
             $layout = $this->getLayout();
 
+            // Force the layout to build to ensure that the "root" element is generated and can be
+            // removed from the list of output elements
+            $layout->publicBuild();
+
             // Render the output container instead of the entire page
             $layout
                 ->removeOutputElement("root")
@@ -79,7 +83,7 @@ class PWA extends View\Result\Page
 
             $data = [
                 "title"   => $this->getPageTitle(),
-                "content" => $this->getLayout()->getOutput() . $this->renderPageSpecificCss(),
+                "content" => $layout->getOutput() . $this->renderPageSpecificCss(),
             ];
 
             $response->representJson($this->jsonEncoder->encode($data));
