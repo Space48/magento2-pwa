@@ -82,6 +82,7 @@ class PWA extends View\Result\Page
             $layout->setElementProperty(static::OUTPUT_CONTAINER_NAME, "htmlClass", $containerClass);
 
             $data = [
+                "url"     => $this->getCurrentUrl(),
                 "title"   => $this->getPageTitle(),
                 "content" => $layout->getOutput() . $this->renderPageSpecificCss(),
             ];
@@ -92,6 +93,19 @@ class PWA extends View\Result\Page
         } else {
             return parent::render($response);
         }
+    }
+
+    /**
+     * Get the URL of the current page.
+     *
+     * @return string
+     */
+    protected function getCurrentUrl()
+    {
+        return $this->urlBuilder->getUrl("*/*/*", [
+            "_current"     => true,
+            "_use_rewrite" => true,
+        ]);
     }
 
     /**
