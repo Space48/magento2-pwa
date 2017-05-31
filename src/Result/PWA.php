@@ -89,6 +89,13 @@ class PWA extends View\Result\Page
             "content" => $layout->getOutput() . $this->renderPageSpecificCss(),
         ];
 
+        // Allow observers to edit generated data
+        $data_object = new \Magento\Framework\DataObject($data);
+        $this->eventManager->dispatch("meanbee_pwa_data_generate_after", [
+            "pwa_response" => $data_object,
+        ]);
+        $data = $data_object->getData();
+
         return $data;
     }
 
