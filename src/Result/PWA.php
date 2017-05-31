@@ -7,7 +7,7 @@ use Magento\Framework\App\ResponseInterface;
 
 class PWA extends View\Result\Page
 {
-    const OUTPUT_CONTAINER_NAME = "columns";
+    const OUTPUT_CONTAINER_NAME = "main.content";
 
     /** @var \Meanbee\PWA\Helper\Config $configHelper */
     protected $configHelper;
