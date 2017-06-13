@@ -5,9 +5,5 @@
         <!-- Ensure minicart has its dependencies config available -->
         <move element="customer.section.config" destination="header.container" />
         <move element="customer.customer.data" destination="header.container" />
-
-        <referenceContainer name="columns" htmlId="shell-target" htmlClass="shell-target">
-            <block name="pwa.placeholder" class="Magento\Framework\View\Element\Template" template="Meanbee_PWA::shell-init.phtml"/>
-        </referenceContainer>
     </body>
 </page>
