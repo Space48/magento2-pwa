@@ -55,6 +55,50 @@ class PWA extends View\Result\Page
         $this->groupedCollectionFactory = $groupedCollectionFactory;
     }
 
+    /**
+     * Generate and return the PWA response data.
+     *
+     * @return array
+     */
+    public function getResponseData()
+    {
+        /** @var \Meanbee\PWA\Model\View\Layout $layout */
+        $layout = $this->getLayout();
+
+        // Force the layout to build to ensure that the "root" element is generated and can be
+        // removed from the list of output elements
+        $layout->publicBuild();
+
+        // Render the output container instead of the entire page
+        $layout
+            ->removeOutputElement("root")
+            ->addOutputElement(static::OUTPUT_CONTAINER_NAME);
+
+        // Migrate the body classes to the output container
+        $containerClass = implode(" ", array_filter([
+            $layout->getElementProperty(static::OUTPUT_CONTAINER_NAME, "htmlClass"),
+            $this->getBodyClassString(),
+        ]));
+        $layout->setElementProperty(static::OUTPUT_CONTAINER_NAME, "htmlClass", $containerClass);
+
+        $data = [
+            "meta"    => [
+                "url"   => $this->getCurrentUrl(),
+                "title" => $this->getPageTitle(),
+            ],
+            "content" => $layout->getOutput() . $this->renderPageSpecificCss(),
+        ];
+
+        // Allow observers to edit generated data
+        $data_object = new \Magento\Framework\DataObject($data);
+        $this->eventManager->dispatch("meanbee_pwa_data_generate_after", [
+            "pwa_response" => $data_object,
+        ]);
+        $data = $data_object->getData();
+
+        return $data;
+    }
+
 
     /**
      * @inheritdoc
@@ -62,34 +106,7 @@ class PWA extends View\Result\Page
     protected function render(ResponseInterface $response)
     {
         if ($this->request->getParam($this->configHelper->getServiceWorkerUrlParamName(), false)) {
-            /** @var \Meanbee\PWA\Model\View\Layout $layout */
-            $layout = $this->getLayout();
-
-            // Force the layout to build to ensure that the "root" element is generated and can be
-            // removed from the list of output elements
-            $layout->publicBuild();
-
-            // Render the output container instead of the entire page
-            $layout
-                ->removeOutputElement("root")
-                ->addOutputElement(static::OUTPUT_CONTAINER_NAME);
-
-            // Migrate the body classes to the output container
-            $containerClass = implode(" ", array_filter([
-                $layout->getElementProperty(static::OUTPUT_CONTAINER_NAME, "htmlClass"),
-                $this->getBodyClassString(),
-            ]));
-            $layout->setElementProperty(static::OUTPUT_CONTAINER_NAME, "htmlClass", $containerClass);
-
-            $data = [
-                "meta"    => [
-                    "url"   => $this->getCurrentUrl(),
-                    "title" => $this->getPageTitle(),
-                ],
-                "content" => $layout->getOutput() . $this->renderPageSpecificCss(),
-            ];
-
-            $response->representJson($this->jsonEncoder->encode($data));
+            $response->representJson($this->jsonEncoder->encode($this->getResponseData()));
 
             return $this;
         } else {
