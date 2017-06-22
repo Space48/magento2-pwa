@@ -7,15 +7,5 @@
     <type name="Magento\Framework\Url\QueryParamsResolver">
         <plugin name="Meanbee_PWA" type="Meanbee\PWA\Plugin\QueryParamsResolverPlugin" sortOrder="1" disabled="false"/>
     </type>
-    <virtualType name="Meanbee\PWA\Model\View\Page\Config\RendererFactory" type="Magento\Framework\View\Page\Config\RendererFactory">
-        <arguments>
-            <argument name="instanceName" xsi:type="string">Meanbee\PWA\Model\View\Page\Config\Renderer</argument>
-        </arguments>
-    </virtualType>
-    <type name="Meanbee\PWA\Result\PWA">
-        <arguments>
-            <argument name="pageConfigRendererFactory" xsi:type="object">Meanbee\PWA\Model\View\Page\Config\RendererFactory</argument>
-        </arguments>
-    </type>
 </config>
 
