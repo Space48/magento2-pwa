@@ -30,7 +30,7 @@ class PWA extends View\Result\Page
         \Magento\Framework\Json\EncoderInterface $jsonEncoder,
         \Meanbee\PWA\Helper\Config $configHelper,
         $template,
-        $isIsolated
+        $isIsolated = false
     ) {
         parent::__construct(
             $context,
