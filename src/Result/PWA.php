@@ -76,11 +76,14 @@ class PWA extends View\Result\Page
         ]));
         $layout->setElementProperty(static::OUTPUT_CONTAINER_NAME, "htmlClass", $containerClass);
 
+        $headBlock = $layout->getBlock("head.additional");
+
         $data = [
             "meta"    => [
                 "url"   => $this->getCurrentUrl(),
                 "title" => $this->getPageTitle(),
             ],
+            "head"    => $headBlock ? $headBlock->toHtml() : "",
             "content" => $layout->getOutput(),
             "assets"  => $this->pageConfigRenderer->renderAssets(),
         ];
