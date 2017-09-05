@@ -2,11 +2,11 @@ version: "2"
 services:
   varnish:
     image: meanbee/magento2-varnish:latest
-    hostname: m2-meanbee-pwa.docker
+    hostname: ${PROJECT_HOSTNAME}
     ports:
       - 80
     environment:
-      - VIRTUAL_HOST=m2-meanbee-pwa.docker
+      - VIRTUAL_HOST=${PROJECT_HOSTNAME}
       - VIRTUAL_PORT=80
       - HTTPS_METHOD=noredirect
       - CERT_NAME=default
@@ -15,25 +15,21 @@ services:
 
   web:
     image: meanbee/magento2-nginx:1.9
-    hostname: web.m2-meanbee-pwa.docker
+    hostname: web.${PROJECT_HOSTNAME}
     ports:
       - 80
     volumes_from:
-      - appdata
-    env_file:
-      - ./magento.env
+      - magento
     links:
       - fpm
 
   fpm:
     image: meanbee/magento2-php:7.0-fpm
-    hostname: fpm.m2-meanbee-pwa.docker
+    hostname: fpm.${PROJECT_HOSTNAME}
     ports:
       - 9000
     volumes_from:
-      - appdata
-    env_file:
-      - ./magento.env
+      - magento
     environment:
       - ENABLE_SENDMAIL=true
       - PHP_ENABLE_XDEBUG
@@ -42,12 +38,10 @@ services:
 
   cron:
     image: meanbee/magento2-php:7.0-cli
-    hostname: cron.m2-meanbee-pwa.docker
+    hostname: cron.${PROJECT_HOSTNAME}
     command: run-cron
     volumes_from:
-      - appdata
-    env_file:
-      - ./magento.env
+      - magento
     environment:
       - ENABLE_SENDMAIL=true
     links:
@@ -55,12 +49,11 @@ services:
 
   cli:
     image: meanbee/magento2-php:7.0-cli
+    command: /bin/true
     volumes_from:
-      - appdata
+      - magento
     volumes:
       - ~/.composer:/root/.composer
-    env_file:
-      - ./magento.env
     environment:
       - COMPOSER_HOME=/root/.composer
       - COMPOSER_ALLOW_SUPERUSER=1
@@ -71,7 +64,7 @@ services:
       - M2SETUP_DB_NAME=magento2
       - M2SETUP_DB_USER=magento2
       - M2SETUP_DB_PASSWORD=magento2
-      - M2SETUP_BASE_URL=https://m2-meanbee-pwa.docker/
+      - M2SETUP_BASE_URL=https://${PROJECT_HOSTNAME}/
       - M2SETUP_BACKEND_FRONTNAME=admin
       - M2SETUP_ADMIN_FIRSTNAME=Admin
       - M2SETUP_ADMIN_LASTNAME=User
@@ -85,10 +78,8 @@ services:
     image: mariadb:10
     ports:
       - 3306
-    volumes_from:
-      - dbdata
-    env_file:
-      - ./magento.env
+    volumes:
+      - dbdata:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=magento2
       - MYSQL_USER=magento2
@@ -96,20 +87,14 @@ services:
       - MYSQL_DATABASE=magento2
       - TERM=dumb
 
-  appdata:
-    image: cweagans/bg-sync
+  magento:
+    image: meanbee/magento2-data:2.1-sample
     volumes:
-      - /var/www/magento
-      - .:/src
+      - .:/extensions/Meanbee_PWA
     environment:
-      - SYNC_SOURCE=/var/www/magento
-      - SYNC_DESTINATION=/src/magento
-      - SYNC_VERBOSE=1
-      - SYNC_MAX_INOTIFY_WATCHES=64000
+      - SYNC_DESTINATION=/extensions/Meanbee_PWA/magento
     privileged: true
-    restart: on-failure:5
 
+volumes:
   dbdata:
-    image: tianon/true
-    volumes:
-      - /var/lib/mysql
+    # Database tables
