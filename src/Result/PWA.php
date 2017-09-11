@@ -69,23 +69,17 @@ class PWA extends View\Result\Page
             ->removeOutputElement("root")
             ->addOutputElement(static::OUTPUT_CONTAINER_NAME);
 
-        // Migrate the body classes to the output container
-        $containerClass = implode(" ", array_filter([
-            $layout->getElementProperty(static::OUTPUT_CONTAINER_NAME, "htmlClass"),
-            $this->getBodyClassString(),
-        ]));
-        $layout->setElementProperty(static::OUTPUT_CONTAINER_NAME, "htmlClass", $containerClass);
-
         $headBlock = $layout->getBlock("head.additional");
 
         $data = [
-            "meta"    => [
+            "meta"      => [
                 "url"   => $this->getCurrentUrl(),
                 "title" => $this->getPageTitle(),
             ],
-            "head"    => $headBlock ? $headBlock->toHtml() : "",
-            "content" => $layout->getOutput(),
-            "assets"  => $this->pageConfigRenderer->renderAssets(),
+            "head"      => $headBlock ? $headBlock->toHtml() : "",
+            "bodyClass" => $this->getBodyClass(),
+            "content"   => $layout->getOutput(),
+            "assets"    => $this->pageConfigRenderer->renderAssets(),
         ];
 
         // Allow observers to edit generated data
@@ -139,12 +133,14 @@ class PWA extends View\Result\Page
     /**
      * Get the string of HTML classes assigned to the <body> element.
      *
-     * @return string
+     * @return string[]
      */
-    protected function getBodyClassString()
+    protected function getBodyClass()
     {
         $this->addDefaultBodyClasses();
 
-        return $this->getConfig()->getElementAttribute(View\Page\Config::ELEMENT_TYPE_BODY, "class") ?: "";
+        $classString = $this->getConfig()->getElementAttribute(View\Page\Config::ELEMENT_TYPE_BODY, "class");
+
+        return $classString ? explode(" ", $classString) : [];
     }
 }
