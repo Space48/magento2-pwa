@@ -29,5 +29,19 @@
     "psr-4": {
       "Meanbee\\PWA\\": "src/"
     }
+  },
+  "scripts": {
+    "dev-install": [
+      "docker-compose run --rm -e COMPOSER_AUTH=\"$(cat $(composer -g config data-dir)/auth.json)\" cli magento-extension-installer Meanbee_PWA"
+    ],
+    "dev-start": [
+      "docker-compose up -d"
+    ],
+    "dev-stop": [
+      "docker-compose stop"
+    ],
+    "dev-destroy": [
+      "docker-compose down -v"
+    ]
   }
 }

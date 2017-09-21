@@ -52,10 +52,8 @@ services:
     command: /bin/true
     volumes_from:
       - magento
-    volumes:
-      - ~/.composer:/root/.composer
     environment:
-      - COMPOSER_HOME=/root/.composer
+      - COMPOSER_HOME=/var/www/magento/var/composer_home
       - COMPOSER_ALLOW_SUPERUSER=1
       - M2SETUP_INSTALL_DB=true
       - M2SETUP_VERSION=2.1.*

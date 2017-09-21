@@ -15,5 +15,5 @@ Install this extension via Composer:
 
 A Docker development environment is included with the project:
 
-    docker-compose run --rm cli magento-extension-installer Meanbee_PWA \
-    && docker-compose up -d
+    composer run-script --timeout 0 dev-install \
+    composer run-script dev-start
