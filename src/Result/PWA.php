@@ -8,6 +8,7 @@ use Magento\Framework\App\ResponseInterface;
 class PWA extends View\Result\Page
 {
     const OUTPUT_CONTAINER_NAME = "main.content";
+    const ADDITIONAL_BLOCK_INCLUDE_ARGUMENT = "pwa_response_include";
 
     /** @var \Meanbee\PWA\Helper\Config $configHelper */
     protected $configHelper;
@@ -57,7 +58,7 @@ class PWA extends View\Result\Page
      */
     public function getResponseData()
     {
-        /** @var \Meanbee\PWA\Model\View\Layout $layout */
+        /** @var \Magento\Framework\View\Layout $layout */
         $layout = $this->getLayout();
 
         // Force the layout to build to ensure that the "root" element is generated and can be
@@ -79,6 +80,7 @@ class PWA extends View\Result\Page
             "head"      => $headBlock ? $headBlock->toHtml() : "",
             "bodyClass" => $this->getBodyClass(),
             "content"   => $layout->getOutput(),
+            "additionalBlocks" => $this->getAdditionalBlocksData($layout),
             "assets"    => $this->pageConfigRenderer->renderAssets(),
         ];
 
@@ -92,6 +94,27 @@ class PWA extends View\Result\Page
         return $data;
     }
 
+    /**
+     * Generate the data for the additional blocks that were marked to be
+     * included in the PWA result through layout.
+     *
+     * @param View\Layout $layout
+     *
+     * @return string[]
+     */
+    public function getAdditionalBlocksData(\Magento\Framework\View\Layout $layout)
+    {
+        $blocks = [];
+
+        foreach ($layout->getAllBlocks() as $name => $block) {
+            /** @var \Magento\Framework\View\Element\AbstractBlock $block */
+            if ($block->getData(static::ADDITIONAL_BLOCK_INCLUDE_ARGUMENT) == true) {
+                $blocks[$name] = $block->toHtml();
+            }
+        }
+
+        return $blocks;
+    }
 
     /**
      * @inheritdoc
