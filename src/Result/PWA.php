@@ -9,6 +9,7 @@ class PWA extends View\Result\Page
 {
     const OUTPUT_CONTAINER_NAME = "main.content";
     const ADDITIONAL_BLOCK_INCLUDE_ARGUMENT = "pwa_response_include";
+    const ADDITIONAL_BLOCK_KEY_PREFIX = "block_";
 
     /** @var \Meanbee\PWA\Helper\Config $configHelper */
     protected $configHelper;
@@ -80,9 +81,11 @@ class PWA extends View\Result\Page
             "head"      => $headBlock ? $headBlock->toHtml() : "",
             "bodyClass" => $this->getBodyClass(),
             "content"   => $layout->getOutput(),
-            "additionalBlocks" => $this->getAdditionalBlocksData($layout),
             "assets"    => $this->pageConfigRenderer->renderAssets(),
         ];
+
+        // Include blocks marked for PWA in layout
+        $data = array_merge($data, $this->getAdditionalBlocksData($layout));
 
         // Allow observers to edit generated data
         $data_object = new \Magento\Framework\DataObject($data);
@@ -109,7 +112,7 @@ class PWA extends View\Result\Page
         foreach ($layout->getAllBlocks() as $name => $block) {
             /** @var \Magento\Framework\View\Element\AbstractBlock $block */
             if ($block->getData(static::ADDITIONAL_BLOCK_INCLUDE_ARGUMENT) == true) {
-                $blocks[$name] = $block->toHtml();
+                $blocks[static::ADDITIONAL_BLOCK_KEY_PREFIX . $name] = $block->toHtml();
             }
         }
 
