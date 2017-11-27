@@ -3,7 +3,7 @@
 namespace Meanbee\PWA\Result;
 
 use Magento\Framework\View;
-use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\App\Response\HttpInterface as HttpResponseInterface;
 
 class PWA extends View\Result\Page
 {
@@ -122,7 +122,7 @@ class PWA extends View\Result\Page
     /**
      * @inheritdoc
      */
-    protected function render(ResponseInterface $response)
+    protected function render(HttpResponseInterface $response)
     {
         if ($this->request->getParam($this->configHelper->getServiceWorkerUrlParamName(), false)) {
             $response->representJson($this->jsonEncoder->encode($this->getResponseData()));

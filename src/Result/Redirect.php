@@ -30,7 +30,7 @@ class Redirect extends Result\Redirect
     /**
      * @inheritdoc
      */
-    public function render(App\ResponseInterface $response)
+    public function render(App\Response\HttpInterface $response)
     {
         // Carry the service worker parameter through to the redirect URL
         $serviceWorkerParam = $this->configHelper->getServiceWorkerUrlParamName();

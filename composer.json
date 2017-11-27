@@ -2,7 +2,7 @@
   "name": "meanbee/magento2-pwa",
   "description": "Progressive Web App helpers for Magento 2.",
   "type": "magento2-module",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "license": [
     "MIT"
   ],
@@ -20,7 +20,7 @@
   },
   "require": {
     "php": ">=7.0",
-    "magento/framework": "^100.1.4"
+    "magento/framework": "^101.0.0"
   },
   "autoload": {
     "files": [
