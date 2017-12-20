@@ -2,8 +2,12 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Magento\Framework\Controller\Result\Redirect" type="Meanbee\PWA\Result\Redirect"/>
-    <preference for="Magento\Framework\App\Response\Http" type="Meanbee\PWA\Response\Http" />
     <preference for="Magento\Framework\View\Result\Page" type="Meanbee\PWA\Result\PWA"/>
+
+    <type name="Magento\Framework\App\Response\Http">
+        <plugin name="Meanbee_PWA_HttpReponse" type="Meanbee\PWA\Plugin\RedirectResponsePlugin" sortOrder="1" disabled="false"/>
+    </type>
+
     <type name="Magento\Framework\Url\QueryParamsResolver">
         <plugin name="Meanbee_PWA" type="Meanbee\PWA\Plugin\QueryParamsResolverPlugin" sortOrder="1" disabled="false"/>
     </type>
