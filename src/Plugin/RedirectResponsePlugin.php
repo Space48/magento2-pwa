@@ -1,52 +1,47 @@
 <?php
 
-namespace Meanbee\PWA\Response;
+namespace Meanbee\PWA\Plugin;
 
-use Magento\Framework\App\Response\Http as Base;
-use Magento\Framework\App\Http\Context;
-use Magento\Framework\Stdlib\Cookie\CookieMetadataFactory;
-use Magento\Framework\Stdlib\CookieManagerInterface;
-use Magento\Framework\Stdlib\DateTime;
 use Magento\Framework\App\Request\Http as HttpRequest;
+use Magento\Framework\App\Response\Http as HttpResponse;
 use Meanbee\PWA\Helper\Config;
 
-class Http extends Base
+class RedirectResponsePlugin
 {
     /**
      * @var Config
      */
-    protected $configHelper;
+    private $configHelper;
+    /**
+     * @var Http
+     */
+    private $request;
     
     /**
+     * RedirectResponsePlugin constructor.
+     *
+     * @param Config      $configHelper
      * @param HttpRequest $request
-     * @param CookieManagerInterface $cookieManager
-     * @param CookieMetadataFactory $cookieMetadataFactory
-     * @param Context $context
-     * @param DateTime $dateTime
      */
-    public function __construct(
-        HttpRequest $request,
-        CookieManagerInterface $cookieManager,
-        CookieMetadataFactory $cookieMetadataFactory,
-        Context $context,
-        DateTime $dateTime,
-        Config $configHelper
-    ) {
-        parent::__construct($request, $cookieManager, $cookieMetadataFactory, $context, $dateTime);
-    
+    public function __construct(Config $configHelper, HttpRequest $request)
+    {
         $this->configHelper = $configHelper;
+        $this->request      = $request;
     }
     
     /**
-     * {@inheritdoc}
+     * @param HttpResponse $subject
+     * @param                                      $url
+     * @param                                      $code
+     * @return array
      */
-    public function setRedirect($url, $code = 302)
+    public function beforeSetRedirect(HttpResponse $subject, $url, $code = 302)
     {
         if ($this->isServiceWorkerRequest()) {
             $url = $this->withServiceWorkerParam($url);
         }
         
-        return parent::setRedirect($url, $code);
+        return [$url, $code];
     }
     
     /**
